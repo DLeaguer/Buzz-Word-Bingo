@@ -27,7 +27,16 @@ app.get('/buzzwords', (req, res) => {
   res.json(words)
 })
 
-app.get('/buzzword/:id', (req, res) => {})
+app.get('/buzzwords/:id', (req, res) => {
+  const { id } = req.params
+  console.log('id =', id)
+  const resData = words.filter(item => {
+    console.log('item.id, id =', item.id, id)
+    return id == item.id
+  })
+  console.log('resData =', resData)
+  res.json(resData)
+})
 
 app.post('/addbuzzword', (req, res) => {})
 
