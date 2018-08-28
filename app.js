@@ -28,8 +28,9 @@ let totalScore = 0
 
 app.get('/buzzwords', (req, res) => {
   res.json(Objects)
-  // console.log('Objects =')
-  // console.log(Objects);
+  console.log('Objects =')
+  console.log(Objects);
+  console.log('totalScore =', totalScore)
 })
 
 app.post('/buzzwords', (req, res) => {
@@ -69,6 +70,7 @@ app.post('/reset', (req, res) => {
     words = []
     totalScore = 0
     res.send({ "success": true })
+    console.log('reset SUCCESSFUL')
   }
   else {
     res.send({ "success": false})
@@ -91,7 +93,7 @@ app.delete('/buzzwords', (req, res) => {
   }
   else {
     res.send({ "success": false})
-    console.log('buzzword COULD NOT BE deleted')
+    console.log('  ** buzzword NOT FOUND')
   }  
 })
 
@@ -103,6 +105,7 @@ app.post('/heard', (req, res) => {
       console.log('element =', element)
       if (element.buzzWord === heard.buzzWord)
       totalScore += Number(element.points)
+      element['heard'] = true
     })
     res.send( `{ "totalScore": ${totalScore} }`)
     console.log('totalScore =', totalScore)
@@ -113,7 +116,31 @@ app.post('/heard', (req, res) => {
   }
 })
 
-
+app.put('/buzzwords', (req, res) => {
+  const wordObj = req.body
+  console.log('wordObj =', wordObj)
+  console.log('totalScore before newScore =', totalScore)
+  if (words.includes(wordObj.buzzWord)) {
+    Objects.forEach(element => {
+      if (element.buzzWord === wordObj.buzzWord) {
+        // console.log('element.buzzWord =', element.buzzWord)
+        // console.log('element.points before =', element.points)
+        // console.log('wordObj.points =', wordObj.points)
+        element.points = Number(wordObj.points)
+        // console.log('element.points after =', element.points)
+        totalScore += Number(element.points)
+        console.log('totalScore =', totalScore)
+        element['heard'] = true
+      }
+    })
+    res.send(`{ "success": true, "newPoints": ${wordObj.points}, "newScore": ${totalScore}`)
+    console.log(`UPDATED newPoints for ${wordObj.buzzWord} = ${wordObj.points} \nUPDATED newScore = ${totalScore} \nUPDATED Objects with "heard": true`)
+  }
+  else {
+    res.send({ "success": false })
+    console.log('  ** COULD NOT UPDATE')
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Server has started on port: ${PORT}`)
